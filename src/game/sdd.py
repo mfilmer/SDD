@@ -68,8 +68,12 @@ class Game(object):
             self._failsRequired = [1,1,1,2,1]
     
     # Getters
+    # Returns the round number. 0 <= round <= 4
     def getRound(self):
         return self._round
+    
+    def getTeamAttempts(self):
+        
     
     # Determine if the game is over or not
     def isGameOver(self):
