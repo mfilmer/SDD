@@ -10,6 +10,10 @@ class IllegalPlay(Error):
 # TeamSizeError is for proposed teams of the wrong size for the current round
 class TeamSizeError(IllegalPlay):
     pass
+# OutOfOrder is for players doing things at the wrong time. Such as voting on a
+# team while the mission is running
+class OutOfOrder(IllegalPlay):
+    pass
 # RoleRulesViolation is for things like good guys failing a mission
 class RoleRulesViolation(IllegalPlay):
     pass
