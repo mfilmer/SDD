@@ -18,8 +18,11 @@ class Player(object):
     def vote(self, choice):
         self.getGame().vote(self, choice)
     
-    def runMission(self, choice):
-        self.getGame().runMission(self, choice)
+    def submitMissionAction(self, choice):
+        self.getGame().submitMissionAction(self, choice)
+    
+    def finalizeTeam(self):
+        self.getGame().finalizeTeam(self)
     
     # Setters
     def setGame(self, game):
@@ -113,6 +116,11 @@ class Game(object):
             self._currentTeam.remove(player)
             player.removeFromTeam()
     
+    def finalizeTeam(self, leader):
+        if leader is not self._leader:
+            raise E.RoleRulesViolation('Only the leader can finalize a team')
+        elif 
+    
     def vote(self, player, choice):
         if self._state is not VoteTeam:
             raise E.OutOfOrder
@@ -120,7 +128,7 @@ class Game(object):
             if choice not isinstance(TeamVote):
                 raise ValueError('Must specify a TeamVote type')
     
-    def runMission(self, player, action):
+    def submitMisisonAction(self, player, action):
         if self._state is not OnMission:
             raise E.OutOfOrder
         else:
