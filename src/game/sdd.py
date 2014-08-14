@@ -3,7 +3,7 @@
 import random
 
 from identifiers import Alignment, Unaligned, Good, Bad
-from identifiers import State, MakeTeam, VoteTeam, RunTeam
+from identifiers import State, MakeTeam, VoteTeam, OnMission
 import errors as E
 
 class Player(object):
@@ -106,7 +106,7 @@ class Game(object):
             self._currentTeam.add(player)
             player.addToTeam()
     
-    def def removeFromTeam(self, leader, player):
+    def removeFromTeam(self, leader, player):
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can propose teams')
         else:
@@ -121,7 +121,7 @@ class Game(object):
                 raise ValueError('Must specify a TeamVote type')
     
     def runMission(self, player, action):
-        if self._state is not RunTeam:
+        if self._state is not OnMission:
             raise E.OutOfOrder
         else:
             if choice is not isinstance(MissionBehavior):

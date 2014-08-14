@@ -9,7 +9,7 @@ class State(object):
     pass
 MakeTeam = State()
 VoteTeam = State()
-RunTeam = State()
+OnMission = State()
 
 class TeamVote():
     pass
