@@ -115,8 +115,7 @@ class Game(object):
         
         # Set up the rounds
         self._state = MakeTeam
-        self._leader = self._players[0]
-        self._leader.setLeader(True)
+        self._advanceLeader()
         
         self._round = 0
         self._nProposedTeams = 0
@@ -151,7 +150,7 @@ class Game(object):
             raise E.TeamSizeError
         self._currentTeam.add(player)
         player.addToTeam()
-        self.onTeamChange()
+        self.onTeamChange(self._currentTeam)
     
     def removeFromTeam(self, leader, player):
         if self._state is not MakeTeam:
@@ -160,7 +159,7 @@ class Game(object):
             raise E.RoleRulesViolation('Only the leader can propose teams')
         self._currentTeam.remove(player)
         player.removeFromTeam()
-        self.onTeamChange()
+        self.onTeamChange(self._currentTeam)
     
     def finalizeTeam(self, leader):
         if self._state is not MakeTeam:
@@ -217,7 +216,7 @@ class Game(object):
         self._nProposedTeams = 0
         self._currentTeam = {}
         self._setState(MakeTeam)
-        self.onNewRound()
+        self.onNewRound(self._round)
     
     def _advanceLeader(self):
         self._leader.setLeader(False)
@@ -225,23 +224,23 @@ class Game(object):
         self._players.add(tmp)
         self._leader = self._players(0)
         self._leader.setLeader(True)
-        self.onNewLeader()
+        self.onNewLeader(self._leader)
     
     def _setState(self, newState):
         self._state = newState
-        self.onStateChange()
+        self.onStateChange(newState)
     
     # Abstract methods that can be modified in a subclass
-    def onTeamChange(self):
+    def onTeamChange(self, team):
         return
     
-    def onNewLeader(self):
+    def onNewLeader(self, leader):
         return
     
-    def onStateChange(self):
+    def onStateChange(self, newState):
         return
     
-    def onNewRound(self):
+    def onNewRound(self, roundNumber):
         return
     
     # Getters
