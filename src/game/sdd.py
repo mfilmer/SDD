@@ -4,7 +4,7 @@ import random
 from collections import Counter
 
 from identifiers import Alignment, Unaligned, Good, Bad
-from identifiers import State, MakeTeam, VoteTeam, OnMission
+from identifiers import State, MakeTeam, VoteTeam, OnMission, GameOver
 from identifiers import TeamVote, Approve, Reject
 from identifiers import MisisonBehavior, Pass, Fail
 from identifiers import VictoryReason, ThreeMissions, FiveRejectedTeams
@@ -89,7 +89,7 @@ class Player(object):
 class Game(object):
     def __init__(self, setup)__:
         # The game is not yet over
-        self._victory = None
+        self._victory = Unaligned
         # Outcome of each mission
         self._missionHistory =
                 [Unaligned, Unaligned, Unaligned, Unaligned, Unaligned]
@@ -304,4 +304,4 @@ class Game(object):
     
     # Determine if the game is over or not
     def isGameOver(self):
-        return self._victory is not None
+        return self._victory is not Unaligned

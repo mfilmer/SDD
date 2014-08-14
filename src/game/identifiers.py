@@ -10,6 +10,7 @@ class State(object):
 MakeTeam = State()
 VoteTeam = State()
 OnMission = State()
+GameOver = State()
 
 class TeamVote():
     pass
