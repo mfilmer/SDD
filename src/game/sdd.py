@@ -201,6 +201,11 @@ class Game(object):
     
     def _setState(self, newState):
         self._state = newState
+        self.onStateChange()
+    
+    # Actions for subclasses
+    def onStateChange(self):
+        return NotImplemented
     
     # Getters
     # Returns the round number. 0 <= round <= 4
