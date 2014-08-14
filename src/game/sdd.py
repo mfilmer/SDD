@@ -191,6 +191,7 @@ class Game(object):
         self._advanceLeader()
         self._nProposedTeams = 0
         self._setState(MakeTeam)
+        self.onNewRound()
     
     def _advanceLeader(self):
         self._leader.setLeader(False)
@@ -198,14 +199,21 @@ class Game(object):
         self._players.add(tmp)
         self._leader = self._players(0)
         self._leader.setLeader(True)
+        self.onNewLeader()
     
     def _setState(self, newState):
         self._state = newState
         self.onStateChange()
     
     # Actions for subclasses
+    def onNewLeader(self):
+        return
+    
     def onStateChange(self):
-        return NotImplemented
+        return
+    
+    def onNewRound(self):
+        return
     
     # Getters
     # Returns the round number. 0 <= round <= 4
