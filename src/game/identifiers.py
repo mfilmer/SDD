@@ -20,3 +20,9 @@ class MissionBehavior(object):
     pass
 Pass = MissionBehavior()
 Fail = MissionBehavior()
+
+# Reason the winning team won
+class VictoryReason(object):
+    pass
+ThreeMissions = VictoryReason()
+FiveRejectedTeams = VictoryReason()

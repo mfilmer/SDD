@@ -5,6 +5,9 @@ from collections import Counter
 
 from identifiers import Alignment, Unaligned, Good, Bad
 from identifiers import State, MakeTeam, VoteTeam, OnMission
+from identifiers import TeamVote, Approve, Reject
+from identifiers import MisisonBehavior, Pass, Fail
+from identifiers import VictoryReason, ThreeMissions, FiveRejectedTeams
 import errors as E
 
 class Player(object):
@@ -60,7 +63,10 @@ class Player(object):
 class Game(object):
     def __init__(self, setup)__:
         # The game is not yet over
-        self._gameOver = False
+        self._victory = None
+        # Outcome of each mission
+        self._missionHistory =
+                [Unaligned, Unaligned, Unaligned, Unaligned, Unaligned]
         
         # Get the set of players and count them
         self._players = set(setup['players'])
@@ -116,6 +122,8 @@ class Game(object):
     def addToTeam(self, leader, player):
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can propose teams')
+        if len(self._currentTeam) >= self._missionSize[self._round]:
+            raise E.TeamSizeError
         self._currentTeam.add(player)
         player.addToTeam()
     
@@ -128,24 +136,40 @@ class Game(object):
     def finalizeTeam(self, leader):
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can finalize a team')
+        if len(self._currentTeam) != self._missionSize[self._round]
+            raise E.TeamSizeError
     
     def vote(self, player, choice):
         if self._state is not VoteTeam:
-            raise E.OutOfOrder
+            # Now is not the time to vote on a team
+            raise E.OutOfOrder('Now is not the time to vote on a team')
         if choice is None:
+            # The player is retracting their vote
             self._submittedVotes.remove(player)
             return
         if choice not isinstance(TeamVote):
             raise ValueError('Must specify a TeamVote type')
         self._submittedVotes.add(player)
         
-        # If not everyone has voted, then we are done
-        if len(self._submittedVotes) ~= self._nPlayers:
+        # If not everyone has voted, then we continue to wait
+        if len(self._submittedVotes) != self._nPlayers:
             return
         
         # Tally the votes and reset for next round
         voteCount = Counter(p.getVote() for p in self._submittedVotes)
         self._submittedVotes = {}
+        if voteCount[Approve] > voteCount[Reject]:
+            # Team vote passes. Move on to the mission
+            self._state = OnMission
+        else:
+            # Team vote fails
+            self._nProposedTeams += 1
+            if self._nProposedTeams == 5:
+                # Bad team wins
+                self._victory = Bad
+                self._victoryReason = FiveRjectedTeams
+                return
+            self._advanceLeader()
     
     def submitMisisonAction(self, player, action):
         if self._state is not OnMission:
@@ -153,6 +177,20 @@ class Game(object):
         else:
             if choice is not isinstance(MissionBehavior):
                 raise ValueError('Must specify a MissionBehavior type')
+    
+    # Internal actions
+    def _advanceRound(self):
+        self._round += 1
+        self._advanceLeader()
+        self._nProposedTeams = 0
+        self._state = MakeTeam
+    
+    def _advanceLeader(self):
+        self._leader.setLeader(False)
+        tmp = self._players.pop(0)
+        self._players.add(tmp)
+        self._leader = self._players(0)
+        self._leader.setLeader(True)
     
     # Getters
     # Returns the round number. 0 <= round <= 4
@@ -165,4 +203,4 @@ class Game(object):
     
     # Determine if the game is over or not
     def isGameOver(self):
-        return self._gameOver
+        return self._victory is not None
