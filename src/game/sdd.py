@@ -120,6 +120,8 @@ class Game(object):
     
     # Player Actions
     def addToTeam(self, leader, player):
+        if self._state is not MakeTeam:
+            raise E.OutOfOrder('Cannot make a team at this time')
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can propose teams')
         if len(self._currentTeam) >= self._missionSize[self._round]:
@@ -128,16 +130,21 @@ class Game(object):
         player.addToTeam()
     
     def removeFromTeam(self, leader, player):
+        if self._state is not MakeTeam:
+            raise E.OutOfOrder('Cannot make a team at this time')
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can propose teams')
         self._currentTeam.remove(player)
         player.removeFromTeam()
     
     def finalizeTeam(self, leader):
+        if self._state is not MakeTeam:
+            raise E.OutOfOrder('Cannot make a team at this time')
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can finalize a team')
         if len(self._currentTeam) != self._missionSize[self._round]
             raise E.TeamSizeError
+        self._setState(VoteTeam)
     
     def vote(self, player, choice):
         if self._state is not VoteTeam:
@@ -155,12 +162,12 @@ class Game(object):
         if len(self._submittedVotes) != self._nPlayers:
             return
         
-        # Tally the votes and reset for next round
+        # Tally the votes
         voteCount = Counter(p.getVote() for p in self._submittedVotes)
         self._submittedVotes = {}
         if voteCount[Approve] > voteCount[Reject]:
             # Team vote passes. Move on to the mission
-            self._state = OnMission
+            self._setState(OnMission)
         else:
             # Team vote fails
             self._nProposedTeams += 1
@@ -183,7 +190,7 @@ class Game(object):
         self._round += 1
         self._advanceLeader()
         self._nProposedTeams = 0
-        self._state = MakeTeam
+        self._setState(MakeTeam)
     
     def _advanceLeader(self):
         self._leader.setLeader(False)
@@ -191,6 +198,9 @@ class Game(object):
         self._players.add(tmp)
         self._leader = self._players(0)
         self._leader.setLeader(True)
+    
+    def _setState(self, newState):
+        self._state = newState
     
     # Getters
     # Returns the round number. 0 <= round <= 4
@@ -200,6 +210,9 @@ class Game(object):
     # Returns number of attempts at making the team between 0 and 3 inclusive
     def getTeamAttempts(self):
         return self._nProposedTeams
+    
+    def getState(self):
+        return self._state
     
     # Determine if the game is over or not
     def isGameOver(self):
