@@ -3,11 +3,11 @@
 import random
 from collections import Counter
 
-from identifiers import Alignment, Unaligned, Good, Bad
-from identifiers import State, MakeTeam, VoteTeam, OnMission, GameOver
-from identifiers import TeamVote, Approve, Reject
-from identifiers import MissionBehavior, Pass, Fail
-from identifiers import VictoryReason, ThreeMissions, FiveRejectedTeams
+from identifiers import Alignment, Unaligned, Good, Bad \
+                       ,State, MakeTeam, VoteTeam, OnMission, GameOver \
+                       ,TeamVote, Approve, Reject \
+                       ,MissionBehavior, Pass, Fail \
+                       ,VictoryReason, ThreeMissions, FiveRejectedTeams
 import errors as E
 
 class Player(object):
