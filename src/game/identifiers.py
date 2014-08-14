@@ -1,9 +1,9 @@
 # Singleton Identifiers
 class Alignment(object):
     pass
-Unaligned = Role()
-Good = Role()
-Bad = Role()
+Unaligned = Alignment()
+Good = Alignment()
+Bad = Alignment()
 
 class State(object):
     pass

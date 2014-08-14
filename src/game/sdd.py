@@ -6,7 +6,7 @@ from collections import Counter
 from identifiers import Alignment, Unaligned, Good, Bad
 from identifiers import State, MakeTeam, VoteTeam, OnMission, GameOver
 from identifiers import TeamVote, Approve, Reject
-from identifiers import MisisonBehavior, Pass, Fail
+from identifiers import MissionBehavior, Pass, Fail
 from identifiers import VictoryReason, ThreeMissions, FiveRejectedTeams
 import errors as E
 
@@ -87,11 +87,11 @@ class Player(object):
         return
 
 class Game(object):
-    def __init__(self, setup)__:
+    def __init__(self, setup):
         # The game is not yet over
         self._victory = Unaligned
         # Outcome of each mission
-        self._missionHistory =
+        self._missionHistory = \
                 [Unaligned, Unaligned, Unaligned, Unaligned, Unaligned]
         
         # Get the set of players and count them
@@ -171,7 +171,7 @@ class Game(object):
             raise E.OutOfOrder('Cannot make a team at this time')
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can finalize a team')
-        if len(self._currentTeam) != self._missionSize[self._round]
+        if len(self._currentTeam) != self._missionSize[self._round]:
             raise E.TeamSizeError
         self._setState(VoteTeam)
     
@@ -183,7 +183,7 @@ class Game(object):
             # The player is retracting their vote
             self._submittedVotes.remove(player)
             return
-        if choice not isinstance(TeamVote):
+        if not isinstance(choice, TeamVote):
             raise ValueError('Must specify a TeamVote type')
         self._submittedVotes.add(player)
         
@@ -213,7 +213,7 @@ class Game(object):
             raise E.OutOfOrder
         if player not in self._currentTeam:
             raise RoleRulesViolation('Not on current team')
-        if choice is not isinstance(MissionBehavior):
+        if not isinstance(action, MissionBehavior):
             raise ValueError('Must specify a MissionBehavior type')
         if player in self._submittedActions:
             raise IlegalPlay('Action already submitted')

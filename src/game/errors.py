@@ -1,11 +1,11 @@
 # Errors
 
 # When there are errors in the setup
-class InvalidSetup(Error):
+class InvalidSetup(Exception):
     pass
 # General purpose illegal play exception. Other exceptions are derived from
 # this one
-class IllegalPlay(Error):
+class IllegalPlay(Exception):
     pass
 # TeamSizeError is for proposed teams of the wrong size for the current round
 class TeamSizeError(IllegalPlay):
