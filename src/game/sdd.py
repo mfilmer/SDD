@@ -67,6 +67,9 @@ class Player(object):
     def getVote(self):
         return self._currentVote
     
+    def getAlignment(self):
+        return self._alignment
+    
     # Abstract methods to be implemented in subclasses
     def onBecomeLeader(self):
         return
@@ -121,6 +124,8 @@ class Game(object):
         self._nProposedTeams = 0
         self._currentTeam = {}
         self._submittedVotes = {}
+        self._submittedActions
+        self._actionsCounter = Counter()
         if self._nPlayers == 5:
             self._missionSize = [2,3,2,3,3]
             self._failsRequired = [1,1,1,1,1]
@@ -198,16 +203,49 @@ class Game(object):
             if self._nProposedTeams == 5:
                 # Bad team wins
                 self._victory = Bad
-                self._victoryReason = FiveRjectedTeams
+                self._victoryReason = FiveRejectedTeams
+                self.onGameOver(Bad, FiveRejectedTeams)
                 return
             self._advanceLeader()
     
     def submitMisisonAction(self, player, action):
         if self._state is not OnMission:
             raise E.OutOfOrder
-        if player not in self._currentTeam
+        if player not in self._currentTeam:
+            raise RoleRulesViolation('Not on current team')
         if choice is not isinstance(MissionBehavior):
             raise ValueError('Must specify a MissionBehavior type')
+        if player in self._submittedActions:
+            raise IlegalPlay('Action already submitted')
+        if action is Fail and player.getAlignment is Good:
+            raise E.RoleRulesViolation('Only bad guys can fail missions')
+        self._submittedActions.add(player)
+        self._actionCounter[action] += 1
+        self.onActionSubmitted(player)
+        if len(self._submittedActions) < len(self._currentTeam):
+            # Wait for more players to submit actions
+            return
+        
+        # Mission done, determine the outcome of the mission
+        if self._actionCounter[Fail] >= self._failsRequired[self._round]:
+            # Bad guys get a point
+            roundWinner = Bad
+        else:
+            # Good guys get a point
+            roundWinner = Good
+        self._missionHistory[self._round] = roundWinner
+        self.onMissionComplete(self, roundWinner, self._actionCounter)
+        
+        # Check if there is a winner
+        missionCount = Counter(self._missionHistory)
+        if missionCount[roundWinner] != 3:
+            # Next round
+            self._advanceRound()
+            return
+        
+        self._victory = roundWinner
+        self._victoryReason = ThreeMissions
+        self.onGameOver(roundWinner, ThreeMissions)
     
     # Internal actions
     def _advanceRound(self):
@@ -230,7 +268,7 @@ class Game(object):
         self._state = newState
         self.onStateChange(newState)
     
-    # Abstract methods that can be modified in a subclass
+    # Abstract methods to be modified in a subclass
     def onTeamChange(self, team):
         return
     
@@ -241,6 +279,15 @@ class Game(object):
         return
     
     def onNewRound(self, roundNumber):
+        return
+    
+    def onActionSubmitted(self, actionSubmitter):
+        return
+    
+    def onMissionComplete(self, team, tally):
+        return
+    
+    def onGameOver(self, winner, reason):
         return
     
     # Getters
