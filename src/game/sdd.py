@@ -43,15 +43,22 @@ class Player(object):
     
     def setAlignment(self, alignment):
         self._alignment = alignment
+        self.onAlignmentChange(alignment)
     
     def setLeader(self, isLeader):
         self._isLeader = bool(isLeader)
+        if self._isLeader:
+            self.onBecomeLeader()
+        else:
+            self.onLoseLeader()
     
     def addToTeam(self):
         self._onTeam = True
+        self.onJoinTeam()
     
     def removeFromTeam(self):
         self._onTeam = False
+        self.onLeaveTeam()
     
     # Getters
     def getGame(self):
@@ -59,6 +66,22 @@ class Player(object):
     
     def getVote(self):
         return self._currentVote
+    
+    # Abstract methods to be implemented in subclasses
+    def onBecomeLeader(self):
+        return
+    
+    def onLoseLeader(self):
+        return
+    
+    def onJoinTeam(self):
+        return
+    
+    def onLeaveTeam(self):
+        return
+    
+    def onAlignmentChange(self, alignment):
+        return
 
 class Game(object):
     def __init__(self, setup)__:
@@ -128,6 +151,7 @@ class Game(object):
             raise E.TeamSizeError
         self._currentTeam.add(player)
         player.addToTeam()
+        self.onTeamChange()
     
     def removeFromTeam(self, leader, player):
         if self._state is not MakeTeam:
@@ -136,6 +160,7 @@ class Game(object):
             raise E.RoleRulesViolation('Only the leader can propose teams')
         self._currentTeam.remove(player)
         player.removeFromTeam()
+        self.onTeamChange()
     
     def finalizeTeam(self, leader):
         if self._state is not MakeTeam:
@@ -181,15 +206,16 @@ class Game(object):
     def submitMisisonAction(self, player, action):
         if self._state is not OnMission:
             raise E.OutOfOrder
-        else:
-            if choice is not isinstance(MissionBehavior):
-                raise ValueError('Must specify a MissionBehavior type')
+        if player not in self._currentTeam
+        if choice is not isinstance(MissionBehavior):
+            raise ValueError('Must specify a MissionBehavior type')
     
     # Internal actions
     def _advanceRound(self):
         self._round += 1
         self._advanceLeader()
         self._nProposedTeams = 0
+        self._currentTeam = {}
         self._setState(MakeTeam)
         self.onNewRound()
     
@@ -205,7 +231,10 @@ class Game(object):
         self._state = newState
         self.onStateChange()
     
-    # Actions for subclasses
+    # Abstract methods that can be modified in a subclass
+    def onTeamChange(self):
+        return
+    
     def onNewLeader(self):
         return
     
