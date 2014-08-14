@@ -1,6 +1,7 @@
 # SDD game class
 
 import random
+from collections import Counter
 
 from identifiers import Alignment, Unaligned, Good, Bad
 from identifiers import State, MakeTeam, VoteTeam, OnMission
@@ -13,10 +14,16 @@ class Player(object):
         self._isLeader = False
         self._game = None
         self._onTeam = False
+        self._currentVote = None
     
     # Player Actions
     def vote(self, choice):
         self.getGame().vote(self, choice)
+        self._currentVote = choice
+    
+    def retractVote(self):
+        self.getGame().vote(self, None)
+        self._currentVote = None
     
     def submitMissionAction(self, choice):
         self.getGame().submitMissionAction(self, choice)
@@ -46,6 +53,9 @@ class Player(object):
     # Getters
     def getGame(self):
         return self._game
+    
+    def getVote(self):
+        return self._currentVote
 
 class Game(object):
     def __init__(self, setup)__:
@@ -82,6 +92,7 @@ class Game(object):
         self._round = 0
         self._nProposedTeams = 0
         self._currentTeam = {}
+        self._submittedVotes = {}
         if self._nPlayers == 5:
             self._missionSize = [2,3,2,3,3]
             self._failsRequired = [1,1,1,1,1]
@@ -105,28 +116,36 @@ class Game(object):
     def addToTeam(self, leader, player):
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can propose teams')
-        else:
-            self._currentTeam.add(player)
-            player.addToTeam()
+        self._currentTeam.add(player)
+        player.addToTeam()
     
     def removeFromTeam(self, leader, player):
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can propose teams')
-        else:
-            self._currentTeam.remove(player)
-            player.removeFromTeam()
+        self._currentTeam.remove(player)
+        player.removeFromTeam()
     
     def finalizeTeam(self, leader):
         if leader is not self._leader:
             raise E.RoleRulesViolation('Only the leader can finalize a team')
-        elif 
     
     def vote(self, player, choice):
         if self._state is not VoteTeam:
             raise E.OutOfOrder
-        else:
-            if choice not isinstance(TeamVote):
-                raise ValueError('Must specify a TeamVote type')
+        if choice is None:
+            self._submittedVotes.remove(player)
+            return
+        if choice not isinstance(TeamVote):
+            raise ValueError('Must specify a TeamVote type')
+        self._submittedVotes.add(player)
+        
+        # If not everyone has voted, then we are done
+        if len(self._submittedVotes) ~= self._nPlayers:
+            return
+        
+        # Tally the votes and reset for next round
+        voteCount = Counter(p.getVote() for p in self._submittedVotes)
+        self._submittedVotes = {}
     
     def submitMisisonAction(self, player, action):
         if self._state is not OnMission:
