@@ -7,7 +7,7 @@ from identifiers import Alignment, Unaligned, Good, Bad \
                        ,State, MakeTeam, VoteTeam, OnMission, GameOver \
                        ,TeamVote, Approve, Reject \
                        ,MissionBehavior, Pass, Fail \
-                       ,VictoryReason, ThreeMissions, FiveRejectedTeams
+                       ,VictoryReason, WinThreeMissions, FiveRejectedTeams
 import errors as E
 from player import Player
 
@@ -170,8 +170,8 @@ class Game(object):
             return
         
         self._victory = roundWinner
-        self._victoryReason = ThreeMissions
-        self.onGameOver(roundWinner, ThreeMissions)
+        self._victoryReason = WinThreeMissions
+        self.onGameOver(roundWinner, WinThreeMissions)
     
     # Internal actions
     def _advanceRound(self):

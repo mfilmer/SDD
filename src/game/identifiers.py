@@ -1,29 +1,35 @@
 # Singleton Identifiers
-class Alignment(object):
-    pass
-Unaligned = Alignment()
-Good = Alignment()
-Bad = Alignment()
+class Single(object):
+    def __init__(self, name):
+        self._name = name
+    def __str__(self):
+        return self._name
 
-class State(object):
+class Alignment(Single):
     pass
-MakeTeam = State()
-VoteTeam = State()
-OnMission = State()
-GameOver = State()
+Unaligned = Alignment('Unaligned')
+Good = Alignment('Good')
+Bad = Alignment('Bad')
 
-class TeamVote():
+class State(Single):
     pass
-Approve = TeamVote()
-Reject = TeamVote()
+MakeTeam = State('MakeTeam')
+VoteTeam = State('VoteTeam')
+OnMission = State('OnMission')
+GameOver = State('GameOver')
 
-class MissionBehavior(object):
+class TeamVote(Single):
     pass
-Pass = MissionBehavior()
-Fail = MissionBehavior()
+Approve = TeamVote('Approve')
+Reject = TeamVote('Reject')
+
+class MissionBehavior(Single):
+    pass
+Pass = MissionBehavior('Pass')
+Fail = MissionBehavior('Fail')
 
 # Reason the winning team won
-class VictoryReason(object):
+class VictoryReason(Single):
     pass
-ThreeMissions = VictoryReason()
-FiveRejectedTeams = VictoryReason()
+ThreeMissions = VictoryReason('WinThreeMissions')
+FiveRejectedTeams = VictoryReason('FiveRejectedTeams')
