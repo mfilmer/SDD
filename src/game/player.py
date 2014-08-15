@@ -11,6 +11,12 @@ class Player(object):
         self._onTeam = False
         self._currentVote = None
     
+    def __str__(self):
+        return 'Player: {}'.format(self._name)
+    
+    def __repr__(self):
+        return 'player({})'.format(self._name)
+    
     # Player Actions
     def vote(self, choice):
         self.getGame().vote(self, choice)
