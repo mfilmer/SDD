@@ -39,17 +39,18 @@ class Game(object):
             player.setGame(self)
         
         # Shuffle the players
-        self._players = random.sample(self._players)
+        self._players = random.sample(self._players, self._nPlayers)
         
         # Set up the rounds
         self._state = MakeTeam
+        self._leader = self._players[0]
         self._advanceLeader()
         
         self._round = 0
         self._nProposedTeams = 0
         self._currentTeam = {}
         self._submittedVotes = {}
-        self._submittedActions
+        self._submittedActions = {}
         self._actionsCounter = Counter()
         if self._nPlayers == 5:
             self._missionSize = [2,3,2,3,3]
@@ -179,13 +180,15 @@ class Game(object):
         self._nProposedTeams = 0
         self._currentTeam = {}
         self._setState(MakeTeam)
+        self._submittedActions = {}
+        self._actionCounter = Counter()
         self.onNewRound(self._round)
     
     def _advanceLeader(self):
         self._leader.setLeader(False)
         tmp = self._players.pop(0)
-        self._players.add(tmp)
-        self._leader = self._players(0)
+        self._players.append(tmp)
+        self._leader = self._players[0]
         self._leader.setLeader(True)
         self.onNewLeader(self._leader)
     

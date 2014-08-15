@@ -1,5 +1,7 @@
 # SDD player class
 
+from identifiers import Unaligned
+
 class Player(object):
     def __init__(self, name):
         self._name = name
