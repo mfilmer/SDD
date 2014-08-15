@@ -31,5 +31,5 @@ Fail = MissionBehavior('Fail')
 # Reason the winning team won
 class VictoryReason(Single):
     pass
-ThreeMissions = VictoryReason('WinThreeMissions')
+WinThreeMissions = VictoryReason('WinThreeMissions')
 FiveRejectedTeams = VictoryReason('FiveRejectedTeams')
