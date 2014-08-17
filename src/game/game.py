@@ -8,38 +8,41 @@ from identifiers import Alignment, Unaligned, Good, Bad \
                        ,TeamVote, Approve, Reject \
                        ,MissionBehavior, Pass, Fail \
                        ,VictoryReason, WinThreeMissions, FiveRejectedTeams
+import roles as R
 import errors as E
 from player import Player
 
 class Game(object):
     def __init__(self, setup):
+        # Game setup phase
+        self._state = CreateGame
         # The game is not yet over
         self._victory = Unaligned
         # Outcome of each mission
         self._missionHistory = \
                 [Unaligned, Unaligned, Unaligned, Unaligned, Unaligned]
         
-        # Get the set of players and count them
-        self._players = set(setup['players'])
-        self._nPlayers = len(self._players)
+        # Create the list of players
+        self._players = []
+        self._nPlayers = setup['nPlayers']
         if not (5 <= self._nPlayers <= 10):
             raise E.InvalidSetup('Must have between 5 and 10 players, inclusive')
         self._nGood = self._nPlayers * 2 // 3
         self._nBad = self._nPlayers - self._nGood
         
-        # Set up the teams
-        self._bad = set(random.sample(self._players, self._nBad))
-        self._good = self._players - self._bad
+        # Set up the roles
+        self._unallocatedRoles = setup['roles']
+        nBadRoles = len(x in self._unallocatedRoles if x._team is Bad)
+        nGoodRoles = len(self._unallocatedRoles) - nBadRoles
+        if nBadRoles > self._nBad:
+            raise E.InvalidSetup('Too many roles for the bad team')
+        if nGoodRoles > self._nGood:
+            raise E.InvalidSetup('Too many roles for the good team')
+        self._unallocatedRoles.extend((self._nBad - nBadRoles)*[R.EvilMinion])
+        self._unallocatedRoles.extend((self._nGood - nGoodRoles)*[R.LoyalServant])
         
-        for player in self._bad:
-            player.setAlignment(Bad)
-            player.setGame(self)
-        for player in self._good:
-            player.setAlignment(Good)
-            player.setGame(self)
-        
-        # Shuffle the players
-        self._players = random.sample(self._players, self._nPlayers)
+        # Randomize the roles
+        random.shuffle(self._unallocatedRoles)
         
         # Set up the rounds
         self._state = MakeTeam
@@ -70,6 +73,9 @@ class Game(object):
         elif self._nPlayers == 10:
             self._missionSize = [3,4,4,5,5]
             self._failsRequired = [1,1,1,2,1]
+    
+    def playerJoin(self, name):
+        pass
     
     # Player Actions
     def addToTeam(self, leader, player):
@@ -197,6 +203,9 @@ class Game(object):
         self.onStateChange(newState)
     
     # Abstract methods to be modified in a subclass
+    def onGameStart(self):
+        return
+    
     def onTeamChange(self, team):
         return
     

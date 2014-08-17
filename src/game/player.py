@@ -10,6 +10,7 @@ class Player(object):
         self._game = None
         self._onTeam = False
         self._currentVote = None
+        self._role = None
     
     def __str__(self):
         return 'Player: {}'.format(self._name)
@@ -59,6 +60,9 @@ class Player(object):
         self.onLeaveTeam()
     
     # Getters
+    def getName(self):
+        return self._name
+    
     def getGame(self):
         return self._game
     
