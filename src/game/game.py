@@ -32,7 +32,7 @@ class Game(object):
         
         # Set up the roles
         self._unallocatedRoles = setup['roles']
-        nBadRoles = len(x in self._unallocatedRoles if x._team is Bad)
+        nBadRoles = len(x for x in self._unallocatedRoles if x._team is Bad)
         nGoodRoles = len(self._unallocatedRoles) - nBadRoles
         if nBadRoles > self._nBad:
             raise E.InvalidSetup('Too many roles for the bad team')
@@ -45,10 +45,6 @@ class Game(object):
         random.shuffle(self._unallocatedRoles)
         
         # Set up the rounds
-        self._state = MakeTeam
-        self._leader = self._players[0]
-        self._advanceLeader()
-        
         self._round = 0
         self._nProposedTeams = 0
         self._currentTeam = {}
@@ -74,8 +70,15 @@ class Game(object):
             self._missionSize = [3,4,4,5,5]
             self._failsRequired = [1,1,1,2,1]
     
-    def playerJoin(self, name):
-        pass
+    def playerJoin(self, newPlayer):
+        if any(p.getName() == newPlayer.getName() for p in self._players):
+            raise E.InvalidSetup('Name {} already taken'.format(newPlayer.getName()))
+        newPlayer.setGame(self)
+        self._players.add(newPlayer)
+        
+        # Check if game is startable
+        if len(self._players) == self._nPlayers:
+            self._startGame()
     
     # Player Actions
     def addToTeam(self, leader, player):
@@ -180,6 +183,13 @@ class Game(object):
         self.onGameOver(roundWinner, WinThreeMissions)
     
     # Internal actions
+    def _startGame(self):
+        random.shuffle(self._players)
+        self._leader = self._players[0]
+        self._leader.setLeader(True)
+        self._state = MakeTeam
+        self.onGameStart(self._leader)
+    
     def _advanceRound(self):
         self._round += 1
         self._advanceLeader()
@@ -203,9 +213,10 @@ class Game(object):
         self.onStateChange(newState)
     
     # Abstract methods to be modified in a subclass
-    def onGameStart(self):
+    def onGameStart(self, leader):
         return
     
+    # Any time the leader changes who is on the team
     def onTeamChange(self, team):
         return
     
