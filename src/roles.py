@@ -6,9 +6,6 @@ class Role(object):
     def __repr__(self):
         return self._name
     
-    def __eq__(self, other):
-        return self._name == other._name
-    
     # Abstract methods
     def gameStart(self, game):
         pass
