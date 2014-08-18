@@ -4,7 +4,7 @@ import random
 from collections import Counter
 
 from identifiers import Alignment, Unaligned, Good, Bad \
-                       ,State, MakeTeam, VoteTeam, OnMission, GameOver \
+                       ,State, CreateGame, MakeTeam, VoteTeam, OnMission, GameOver \
                        ,TeamVote, Approve, Reject \
                        ,MissionBehavior, Pass, Fail \
                        ,VictoryReason, WinThreeMissions, FiveRejectedTeams
@@ -32,7 +32,7 @@ class Game(object):
         
         # Set up the roles
         self._unallocatedRoles = setup['roles']
-        nBadRoles = len(x for x in self._unallocatedRoles if x._team is Bad)
+        nBadRoles = len([x for x in self._unallocatedRoles if x._team is Bad])
         nGoodRoles = len(self._unallocatedRoles) - nBadRoles
         if nBadRoles > self._nBad:
             raise E.InvalidSetup('Too many roles for the bad team')
@@ -71,12 +71,19 @@ class Game(object):
             self._failsRequired = [1,1,1,2,1]
     
     def playerJoin(self, newPlayer):
+        # Can only add players before the game has started
+        if self._state is not CreateGame:
+            raise E.OutOfOrder('Cannot add players once the game has started')
+        # Make sure the player name isn't already taken
         if any(p.getName() == newPlayer.getName() for p in self._players):
             raise E.InvalidSetup('Name {} already taken'.format(newPlayer.getName()))
-        newPlayer.setGame(self)
-        self._players.add(newPlayer)
         
-        # Check if game is startable
+        # Setup the player and add him to the game
+        newPlayer.setGame(self)
+        newPlayer.setRole(self._unallocatedRoles.pop()())
+        self._players.append(newPlayer)
+        
+        # Check if game is startable. If so, start it
         if len(self._players) == self._nPlayers:
             self._startGame()
     

@@ -4,6 +4,8 @@ class Single(object):
         self._name = name
     def __str__(self):
         return self._name
+    def __repr__(self):
+        return "{}({})".format(type(self), self._name)
 
 class Alignment(Single):
     pass
@@ -12,7 +14,8 @@ Good = Alignment('Good')
 Bad = Alignment('Bad')
 
 class State(Single):
-    pass
+    def __repr__(self):
+        return "State('{}')".format(self._name)
 CreateGame = State('CreateGame')
 MakeTeam = State('MakeTeam')
 VoteTeam = State('VoteTeam')

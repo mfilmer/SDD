@@ -40,6 +40,12 @@ class Player(object):
         else:
             self._game = game
     
+    def setRole(self, role):
+        if self._role is not None:
+            raise Exception('Connot change the role a player has')
+        else:
+            self._role = role
+    
     def setAlignment(self, alignment):
         self._alignment = alignment
         self.onAlignmentChange(alignment)
