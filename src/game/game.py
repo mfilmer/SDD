@@ -192,6 +192,9 @@ class Game(object):
     # Internal actions
     def _startGame(self):
         random.shuffle(self._players)
+        # Tell each player that the game has started
+        for player in self._players():
+            player.gameStart()
         self._leader = self._players[0]
         self._leader.setLeader(True)
         self._state = MakeTeam

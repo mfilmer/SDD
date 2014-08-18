@@ -18,6 +18,9 @@ class Player(object):
     def __repr__(self):
         return 'player({})'.format(self._name)
     
+    def gameStart(self):
+        self._role.gameStart(self._game)
+    
     # Player Actions
     def vote(self, choice):
         self.getGame().vote(self, choice)
